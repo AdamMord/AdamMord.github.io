@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>2048</title>
+
+	<style>
+		html, body, * { font-family: 'Arial', sans-serif; }
+		#canvas { border: 1px solid red; }
+	</style>
+
+	<script>
+		console.log('It`s 2048, baby!');
+		var usedPositionX = []; // использованные координа по X
+		var usedPositionY = []; // использованные координа по Y
+		var countClick = 0; // Кол-во кликов от пользователя
+		var gridBlock = [[0, 0, 0, 0], 
+						 [0, 0, 0, 0], 
+						 [0, 0, 0, 0], 
+						 [0, 0, 0, 0]];
+		const width = 50;
+		const height = 50;
+
+		// сетка для поля
+		function drawGrid() {
+			var canvas = document.getElementById("canvas");
+
+			if ( canvas.getContext ) {
+				var ctx = canvas.getContext("2d");
+
+				ctx.fillStyle = 'black';
+				ctx.font = '24px Arial';
+
+				// колонки
+				for (var i = 0; i < 250; i+=50) {
+					ctx.beginPath();
+					ctx.moveTo(i, 0);
+					ctx.lineTo(i, 250);
+					ctx.stroke();
+				}
+
+				// строки
+				for (var i = 0; i < 250; i+=50) {
+					ctx.beginPath();
+					ctx.moveTo(0, i);
+					ctx.lineTo(250, i);
+					ctx.stroke();
+				}
+			}
+		}
+
+		function getRandomInt(max) {
+			return Math.floor(Math.random() * Math.floor(max));
+		}
+
+		function randomBlock() {
+			var j = getRandomInt(4);
+			var i = getRandomInt(4);
+
+			if( gridBlock[j][i] == 0 ) {
+				gridBlock[j][i] = 2;
+			}
+		}
+
+		function drawAndMoveElement(move = 0) {
+			var canvas = document.getElementById('canvas');
+
+			if( canvas.getContext && usedPositionX.length < 16) {
+				var ctx = canvas.getContext("2d");
+				var pX;
+				var pY
+				var weight;
+				var temp = [0, 0, 0, 0];
+				var k; // коэфицент для массива temp
+
+				switch(move){
+					case "left":
+						for(var j = 0; j <= 3; j++) {
+							for(var i = 0; i <= 3; i++) {temp[i] = 0;}
+							k = 0;
+							for(var i = 0; i <= 3; i++) {
+								if(gridBlock[j][i] != 0) {
+									temp[k] = gridBlock[j][i];
+									k++;
+								}
+							}
+
+							for(var i = 0; i <= 3; i++) {gridBlock[j][i] = temp[i];}
+
+							for(var i = 1; i <= 3; i++) {
+								if(gridBlock[j][i] == gridBlock[j][i-1]) {
+									gridBlock[j][i-1] = gridBlock[j][i-1]*2;
+									gridBlock[j][i] = 0;
+								} else {
+									if(gridBlock[j][i-1] == 0) {
+										gridBlock[j][i-1] = gridBlock[j][i];
+										gridBlock[j][i] = 0;
+									}
+								}
+							}
+						}
+						ctx.clearRect(0, 0, 1000, 1000);
+						drawGrid();
+						randomBlock();
+					 break;
+
+					case "up":
+						for(var j = 0; j <= 3; j++) {
+							for(var i = 0; i <= 3; i++) {temp[i] = 0;}
+							k = 0;
+							for(var i = 0; i <= 3; i++) {
+								if(gridBlock[i][j] != 0) {
+									temp[k] = gridBlock[i][j];
+									k++;
+								}
+							}
+
+							for(var i = 0; i <= 3; i++) {gridBlock[i][j] = temp[i]}
+
+							for(var i = 1; i <= 3; i++) {
+								if(gridBlock[i][j] == gridBlock[i-1][j]) {
+									gridBlock[i-1][j] = gridBlock[i][j]*2;
+									gridBlock[i][j] = 0;
+								} else {
+									if(gridBlock[i-1][j] == 0) {
+										gridBlock[i-1][j] = gridBlock[i][j];
+										gridBlock[i][j] = 0;
+									}
+								}
+							}
+							ctx.clearRect(0, 0, 1000, 1000);
+							drawGrid();
+							randomBlock();
+						}
+					 break;
+
+					case "right":
+						for(var j = 0; j <= 3; j++) {
+							for(var i = 0; i <= 3; i++) {temp[i] = 0;}
+							k = 3;
+							for(var i = 3; i >= 0; i--) {
+								if(gridBlock[j][i] != 0) {
+									temp[k] = gridBlock[j][i];
+									k--;
+								}
+							}
+
+							for(var i = 0; i <= 3; i++) {gridBlock[j][i] = temp[i];}
+
+							for(var i = 3; i >= 0; i--) {
+								if(gridBlock[j][i] == gridBlock[j][i+1]) {
+									gridBlock[j][i+1] = gridBlock[j][i+1]*2;
+									gridBlock[j][i] = 0;
+								} else {
+									if(gridBlock[j][i+1] == 0) {
+										gridBlock[j][i+1] = gridBlock[j][i];
+										gridBlock[j][i] = 0;
+									}
+								}
+							}
+						}
+						ctx.clearRect(0, 0, 1000, 1000);
+						drawGrid();
+						randomBlock();
+					 break;
+
+					case "down":
+						for(var j = 0; j <= 3; j++) {
+							for(var i = 0; i <= 3; i++) {temp[i] = 0;}
+							k = 3;
+							for(var i = 3; i >= 0; i--) {
+								if(gridBlock[i][j] != 0) {
+									temp[k] = gridBlock[i][j];
+									k--;
+								}
+							}
+
+							for(var i = 0; i <= 3; i++) {gridBlock[i][j] = temp[i]}
+
+							for(var i = 2; i >= 0; i--) {
+								if(gridBlock[i][j] == gridBlock[i+1][j]) {
+									gridBlock[i+1][j] = gridBlock[i][j]*2;
+									gridBlock[i][j] = 0;
+								} else {
+									if(gridBlock[i+1][j] == 0) {
+										gridBlock[i+1][j] = gridBlock[i][j];
+										gridBlock[i][j] = 0;
+									}
+								}
+							}
+
+							ctx.clearRect(0, 0, 1000, 1000);
+							drawGrid();
+							randomBlock();
+						}
+					 break;
+				}
+
+				for(var i = 0; i < gridBlock.length; i++) {
+					for(var k = 0; k < gridBlock[i].length; k++) {
+						if( gridBlock[i][k] > 0 ) {
+							weight = gridBlock[i][k];
+							pX = k * 50;
+							pY = i * 50;
+							ctx.fillStyle = "rgba(200, 0, 0, 0.5)";
+							ctx.fillRect(pX, pY, width, height);
+							ctx.globalCompositeOperation = 'source-over'
+							ctx.fillStyle = 'black';
+							ctx.font = '24px Arial';
+							ctx.fillText(weight, pX + 18, pY + 34);
+						}
+					}
+				}
+			}
+
+			console.log("Кликов: " + countClick);
+		}
+
+		function move(e) {
+			// console.log(e.key);
+
+			// смотрим, какая клавиша была нажата
+			switch(e.key) {
+				// вправо
+				case "ArrowRight":
+					if(countClick > 0 || countClick == 1) {
+						drawAndMoveElement("right");
+						countClick++;
+					} 
+					break;
+
+				// влево
+				case "ArrowLeft":
+					if(countClick > 0 || countClick == 1) {
+						drawAndMoveElement("left");
+						countClick++;
+					} 
+					break;
+
+				// вниз
+				case "ArrowDown":
+					if(countClick > 0 || countClick == 1) {
+						drawAndMoveElement("down");
+						countClick++;
+					} 
+					break;
+
+				// вверх
+				case "ArrowUp":
+					if(countClick > 0 || countClick == 1) {
+						drawAndMoveElement("up");
+						countClick++;
+					} 
+					var i = 20;
+					break;
+
+				// для тестов
+				case " ":
+					if(countClick == 0) {
+						randomBlock();
+						randomBlock();
+						drawAndMoveElement(0, 0);
+						countClick++;
+					} else {
+						console.log(gridBlock);
+					}
+					break;
+			}
+		}
+
+		addEventListener('keydown', move);
+	</script>
+</head>
+<body onload="drawGrid()">
+	<canvas id="canvas" width="200px" height="200px"></canvas>
+	<div class="description">
+		Prees SPACE to start!
+	</div>
+</body>
+</html>
